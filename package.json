@@ -1,5 +1,6 @@
 {
   "name": "ferdig-aws-infra",
+  "description": "AWS CDK Stack to deploy Ferdig into an AWS Fargate Service",
   "version": "0.1.0",
   "bin": {
     "ferdig-aws-infra": "bin/ferdig-aws-infra.js"
