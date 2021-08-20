@@ -1,0 +1,58 @@
+name: Deploy to AWS
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  cancel_previous_runs:
+    name: Cancel previous runs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.4.1
+        with:
+          access_token: ${{ github.token }}
+
+  deploy_aws:
+    name: Deploy AWS
+    runs-on: ubuntu-latest
+    needs:
+      - cancel_previous_runs
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+
+      - name: Start deployment
+        uses: bobheadxi/deployments@master
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.CNX_BOT_GH_TOKEN }}
+          env: production
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: CDK Synth
+        run: yarn cdk synth '*'
+
+      - name: CDK deploy
+        run: yarn cdk deploy --require-approval never
+
+      - name: Update deployment status
+        uses: bobheadxi/deployments@master
+        # Runs even if previous jobs failed or were cancelled
+        if: always()
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+          env_url: ${{ env.DEPLOYMENT_URL }}
