@@ -8,3 +8,4 @@ node_modules
 cdk.out
 .idea
 .env
+/yarn-error.log

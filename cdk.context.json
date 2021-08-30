@@ -1,1 +1,11 @@
-{}
+{
+  "availability-zones:account=931707783777:region=eu-central-1": [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"
+  ],
+  "hosted-zone:account=931707783777:domainName=ferdig.de:region=eu-central-1": {
+    "Id": "/hostedzone/Z09142992S89NGR5T34OX",
+    "Name": "ferdig.de."
+  }
+}
